@@ -54,4 +54,5 @@ public class ResidentsTest {
         assertEquals(0, residents.count());
     }
 
+
 }
