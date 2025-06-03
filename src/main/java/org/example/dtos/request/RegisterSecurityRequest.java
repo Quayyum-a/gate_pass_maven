@@ -1,11 +1,9 @@
 package org.example.dtos.request;
 
 import lombok.Data;
+import org.example.data.models.Security;
 
 @Data
-public class RegisterSecurityRequest {
-    private String fullName;
-    private String email;
-    private String password;
-    private String phoneNumber;
+public class RegisterSecurityRequest extends Security {
+
 }
