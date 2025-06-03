@@ -13,10 +13,11 @@ import org.example.dtos.request.RegisterResidentRequest;
 import org.example.dtos.response.GenerateAccessTokenResponse;
 import org.example.dtos.response.LoginResidentResponse;
 import org.example.dtos.response.RegisterResidentResponse;
+import org.example.exceptions.GatePassException;
+import org.example.exceptions.ResidentAlreadyExsitsException;
+import org.example.exceptions.ResidentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 import static org.example.utils.Mapper.*;
 
@@ -40,7 +41,7 @@ public class ResidentServicesImpl implements ResidentServices {
 
     private void verifyEmail(String email) {
         if (residentRepository.findByEmail(email) != null) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new ResidentAlreadyExsitsException("Email already exists");
         }
     }
 
@@ -54,7 +55,7 @@ public class ResidentServicesImpl implements ResidentServices {
     private void verifyEmailAndPassword(String email, String password) {
         Resident resident = residentRepository.findByEmail(email);
         if (resident == null || !resident.getPassword().equals(password)) {
-            throw new IllegalArgumentException("Invalid email or password");
+            throw new GatePassException("Invalid email or password");
         }
     }
 
@@ -62,7 +63,7 @@ public class ResidentServicesImpl implements ResidentServices {
     public GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request) {
         Resident resident = residentRepository.findByEmail(request.getEmail());
         if (resident == null) {
-            throw new IllegalArgumentException("Resident not found");
+            throw new ResidentNotFoundException("Resident not found");
         }
         Visitor visitor = visitorInformation(request);
         Visitor savedVisitor = visitorRepository.save(visitor);
