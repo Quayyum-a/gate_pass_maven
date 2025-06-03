@@ -5,4 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface AccessTokens extends MongoRepository<AccessToken, String> {
 
+    AccessToken findByToken(String token);
 }
