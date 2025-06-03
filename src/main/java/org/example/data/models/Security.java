@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Security {
     @Id
     private String id;
-    private String name;
-    private String employeeId;
+    private String fullName;
+    private String email;
+    private String phoneNumber;
+    private String password;
 }
