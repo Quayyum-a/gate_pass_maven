@@ -8,9 +8,10 @@ import java.time.LocalDateTime;
 public class GenerateAccessTokenResponse {
     private String email;
     private String token;
+    private LocalDateTime creationDate;
     private LocalDateTime expiryDate;
     private String visitorName;
     private String visitorPhoneNumber;
     private String whomToSee;
-
+    private boolean Used;
 }
