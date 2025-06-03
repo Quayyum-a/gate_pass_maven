@@ -21,6 +21,8 @@ public class AccessToken {
     @DBRef
     private Visitor visitor;
     private String visitorPhoneNumber;
+    private String whomToSee;
+    private String visitorName;
 
 
 }
