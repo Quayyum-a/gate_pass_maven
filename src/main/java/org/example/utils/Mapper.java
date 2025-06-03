@@ -52,9 +52,13 @@ public class Mapper {
 
     }
 
-    public static RegisterSecurityResponse mapToRegisterSecurityResponse(Security security){
+    public static RegisterSecurityResponse mapToRegisterSecurityResponse(Security security) {
+        if (security == null) {
+            return null;
+        }
         RegisterSecurityResponse response = new RegisterSecurityResponse();
         response.setFullName(security.getFullName());
+        response.setPhoneNumber(security.getPhoneNumber());
         response.setEmail(security.getEmail());
         return response;
     }
