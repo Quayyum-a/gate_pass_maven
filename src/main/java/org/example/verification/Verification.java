@@ -30,7 +30,7 @@ public class Verification {
     }
 
     @Autowired
-    private static AccessTokens accessTokenRepository;
+    public static AccessTokens accessTokenRepository;
     public static void verifyToken(AccessToken token) {
         AccessToken accessToken = accessTokenRepository.findByToken(token.getToken());
         if (accessToken == null) {
