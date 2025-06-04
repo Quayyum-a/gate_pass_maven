@@ -7,9 +7,11 @@ import org.example.data.models.Visitor;
 import org.example.data.repositories.AccessTokens;
 import org.example.data.repositories.Residents;
 import org.example.data.repositories.Visitors;
+import org.example.dtos.request.FindAccessToken;
 import org.example.dtos.request.GenerateAccessTokenRequest;
 import org.example.dtos.request.LoginResidentRequest;
 import org.example.dtos.request.RegisterResidentRequest;
+import org.example.dtos.response.FindAccessTokenResponse;
 import org.example.dtos.response.GenerateAccessTokenResponse;
 import org.example.dtos.response.LoginResidentResponse;
 import org.example.dtos.response.RegisterResidentResponse;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.example.utils.Mapper.*;
+import static org.example.verification.Verification.accessTokenRepository;
+import static org.example.verification.Verification.verifyToken;
 
 @Service
 public class ResidentServicesImpl implements ResidentServices {
@@ -70,5 +74,20 @@ public class ResidentServicesImpl implements ResidentServices {
         AccessToken accessToken = accessTokenInformation(resident, savedVisitor);
         AccessToken savedToken = accessTokenService.save(accessToken);
         return mapToAccessTokenResponse(savedToken);
+    }
+
+    @Override
+    public FindAccessTokenResponse findAccessToken(FindAccessToken request) {
+            FindAccessTokenResponse response = new FindAccessTokenResponse();
+            AccessToken accessToken = accessTokenRepository.findByToken(request.getAccessCode());
+            verifyToken(accessToken);
+            response.setVisitorName(accessToken.getVisitorName());
+            response.setVisitorPhoneNumber(accessToken.getVisitorPhoneNumber());
+            response.setWhomToSee(accessToken.getWhomToSee());
+            response.setResidentFullName(accessToken.getResident().getFullName());
+            response.setResidentAddress(accessToken.getResident().getAddress());
+            response.setResidentEmail(accessToken.getResident().getEmail());
+            response.setIsValid(true);
+            return response;
     }
 }
