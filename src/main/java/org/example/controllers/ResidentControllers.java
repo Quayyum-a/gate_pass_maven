@@ -2,6 +2,7 @@ package org.example.controllers;
 
 
 
+import org.example.data.models.Visitor;
 import org.example.dtos.request.FindAccessToken;
 import org.example.dtos.request.GenerateAccessTokenRequest;
 import org.example.dtos.request.RegisterResidentRequest;
@@ -58,13 +59,5 @@ public class ResidentControllers {
         }
     }
 
-    @GetMapping("/resident/visitors")
-    public ResponseEntity<ApiResponse> getListOfVisitors() {
-        try {
-            List<Visitor> visitors = residentServices.getListOfVisitors();
-            return new ResponseEntity<>(new ApiResponse(visitors, true), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse("Failed to retrieve visitors: " + e.getMessage(), false), HttpStatus.BAD_REQUEST);
-        }
-    }
+
 }
