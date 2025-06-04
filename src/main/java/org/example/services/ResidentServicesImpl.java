@@ -45,7 +45,7 @@ public class ResidentServicesImpl implements ResidentServices {
 
     private void verifyEmail(String email) {
         if (residentRepository.findByEmail(email) != null) {
-            throw new ResidentAlreadyExsitsException("Email already exists");
+            throw new ResidentAlreadyExsitsException("Resident with this email already exists");
         }
     }
 
