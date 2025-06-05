@@ -5,11 +5,9 @@ package org.example.controllers;
 import org.example.data.models.Visitor;
 import org.example.dtos.request.FindAccessToken;
 import org.example.dtos.request.GenerateAccessTokenRequest;
+import org.example.dtos.request.LoginResidentRequest;
 import org.example.dtos.request.RegisterResidentRequest;
-import org.example.dtos.response.ApiResponse;
-import org.example.dtos.response.FindAccessTokenResponse;
-import org.example.dtos.response.GenerateAccessTokenResponse;
-import org.example.dtos.response.RegisterResidentResponse;
+import org.example.dtos.response.*;
 import org.example.exceptions.GatePassException;
 import org.example.services.ResidentServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +42,16 @@ public class ResidentControllers {
             return new ResponseEntity<>(new ApiResponse(tokenResponse, true), HttpStatus.OK);
         }
         catch (GatePassException e) {
+            return new ResponseEntity<>(new ApiResponse(e.getMessage(), false), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/resident/login")
+    public ResponseEntity<?> loginResidentService(@RequestParam String email, @RequestParam String password) {
+        try {
+            LoginResidentResponse response = residentServices.login(new LoginResidentRequest(email, password));
+            return new ResponseEntity<>(new ApiResponse(response, true), HttpStatus.OK);
+        } catch (GatePassException e) {
             return new ResponseEntity<>(new ApiResponse(e.getMessage(), false), HttpStatus.BAD_REQUEST);
         }
     }
