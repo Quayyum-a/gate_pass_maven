@@ -1,6 +1,5 @@
 package org.example.data.repositories;
 
-import org.example.data.models.Resident;
 import org.example.data.models.Security;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
