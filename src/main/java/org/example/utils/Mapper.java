@@ -1,17 +1,16 @@
 package org.example.utils;
 
-
 import org.example.data.models.AccessToken;
 import org.example.data.models.Resident;
 import org.example.data.models.Security;
 import org.example.data.models.Visitor;
-import org.example.dtos.request.GenerateAccessTokenRequest;
-import org.example.dtos.request.RegisterResidentRequest;
-import org.example.dtos.request.RegisterSecurityRequest;
 import org.example.dtos.response.GenerateAccessTokenResponse;
 import org.example.dtos.response.LoginResidentResponse;
 import org.example.dtos.response.RegisterResidentResponse;
 import org.example.dtos.response.RegisterSecurityResponse;
+import org.example.dtos.request.GenerateAccessTokenRequest;
+import org.example.dtos.request.RegisterResidentRequest;
+import org.example.dtos.request.RegisterSecurityRequest;
 import org.example.exceptions.AccessTokenNotFound;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +28,7 @@ public class Mapper {
         resident.setPassword(request.getPassword());
         return resident;
     }
+
     public static RegisterResidentResponse mapToRegisterResidentResponse(Resident resident) {
         RegisterResidentResponse response = new RegisterResidentResponse();
         response.setFullName(resident.getFullName());
@@ -36,30 +36,29 @@ public class Mapper {
         response.setEmail(resident.getEmail());
         return response;
     }
-    public static LoginResidentResponse mapToLoginResidentResponse(Resident request) {
+
+    public static LoginResidentResponse mapToLoginResidentResponse(Resident resident) {
         LoginResidentResponse response = new LoginResidentResponse();
-        response.setEmail(request.getEmail());
+        response.setFullName(resident.getFullName());
+        response.setEmail(resident.getEmail());
         return response;
     }
 
-    public static Security mapToRegisterSecurityRequest(RegisterSecurityRequest request){
+    public static Security mapToRegisterSecurityRequest(RegisterSecurityRequest request) {
         Security security = new Security();
         security.setFullName(request.getFullName());
         security.setPhoneNumber(request.getPhoneNumber());
         security.setEmail(request.getEmail());
         security.setPassword(request.getPassword());
         return security;
-
     }
 
     public static RegisterSecurityResponse mapToRegisterSecurityResponse(Security security) {
-        if (security == null) {
-            return null;
-        }
         RegisterSecurityResponse response = new RegisterSecurityResponse();
         response.setFullName(security.getFullName());
         response.setPhoneNumber(security.getPhoneNumber());
         response.setEmail(security.getEmail());
+        response.setMessage("Security registered successfully");
         return response;
     }
 
@@ -67,16 +66,18 @@ public class Mapper {
         Visitor visitor = new Visitor();
         visitor.setFullName(request.getVisitorName());
         visitor.setPhoneNumber(request.getVisitorPhoneNumber());
+        visitor.setPurpose("Visit"); // Default purpose
         return visitor;
     }
 
-    public static AccessToken accessTokenInformation(Resident resident, Visitor visitor){
+    public static AccessToken accessTokenInformation(Resident resident, Visitor visitor) {
         AccessToken accessToken = new AccessToken();
         accessToken.setResident(resident);
         accessToken.setVisitor(visitor);
         accessToken.setCreationDate(LocalDateTime.now());
-        accessToken.setExpiryDate(LocalDateTime.now().plusMinutes(5));
+        accessToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
         accessToken.setUsed(false);
+        accessToken.setStatus("active");
         accessToken.setToken(generateAccessToken());
         return accessToken;
     }
@@ -95,28 +96,6 @@ public class Mapper {
             tokenBuilder.append(chars[randomIndex]);
         }
         return tokenBuilder.toString();
-    }
-
-    public static Security mapToLoginSecurityResponse(RegisterSecurityRequest request){
-        Security security = new Security();
-        security.setFullName(request.getFullName());
-        security.setEmail(request.getEmail());
-        return security;
-    }
-
-    public static AccessToken mapToAccessTokenRequest(GenerateAccessTokenRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request cannot be null");
-        }
-        AccessToken accessToken = new AccessToken();
-        accessToken.setWhomToSee(request.getWhomToSee());
-        accessToken.setVisitorName(request.getVisitorName());
-        accessToken.setVisitorPhoneNumber(request.getVisitorPhoneNumber());
-        accessToken.setCreationDate(LocalDateTime.now());
-        accessToken.setExpiryDate(LocalDateTime.now().plusMinutes(5));
-        accessToken.setUsed(false);
-        accessToken.setToken(generateAccessToken());
-        return accessToken;
     }
 
     public static GenerateAccessTokenResponse mapToAccessTokenResponse(AccessToken accessToken) {
