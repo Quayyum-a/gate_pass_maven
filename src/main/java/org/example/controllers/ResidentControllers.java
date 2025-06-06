@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
 @RequestMapping("/api")
 public class ResidentControllers {
 
@@ -23,7 +25,7 @@ public class ResidentControllers {
     }
 
     @PostMapping("/resident/register")
-    public ResponseEntity<ApiResponse<?>> registerResident( @RequestBody RegisterResidentRequest request) {
+    public ResponseEntity<ApiResponse<?>> registerResident(@RequestBody RegisterResidentRequest request) {
         try {
             if (request == null) {
                 return ResponseEntity.badRequest()
@@ -31,7 +33,7 @@ public class ResidentControllers {
             }
             RegisterResidentResponse response = residentServices.register(request);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse<>(response, "Resident registered successfully"));
+                    .body(new ApiResponse<>(new UserResponse(response), "Resident registered successfully"));
         } catch (GatePassException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(e.getMessage(), false));
@@ -42,17 +44,14 @@ public class ResidentControllers {
     }
 
     @PostMapping("/resident/login")
-    public ResponseEntity<ApiResponse<?>> loginResident(
-            @RequestParam("email") String email,
-            @RequestParam("password") String password) {
+    public ResponseEntity<ApiResponse<?>> loginResident(@RequestBody LoginResidentRequest request) {
         try {
-            if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            if (request == null || request.getEmail() == null || request.getPassword() == null) {
                 return ResponseEntity.badRequest()
                         .body(new ApiResponse<>("Email and password are required", false));
             }
-            LoginResidentRequest loginRequest = new LoginResidentRequest(email.trim(), password.trim());
-            LoginResidentResponse response = residentServices.login(loginRequest);
-            return ResponseEntity.ok(new ApiResponse<>(response, "Login successful"));
+            LoginResidentResponse response = residentServices.login(request);
+            return ResponseEntity.ok(new ApiResponse<>(new UserResponse(response), "Login successful"));
         } catch (GatePassException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(e.getMessage(), false));
@@ -63,15 +62,13 @@ public class ResidentControllers {
     }
 
     @PostMapping("/resident/generate/code")
-    public ResponseEntity<ApiResponse<?>> generateAccessToken( @RequestBody GenerateAccessTokenRequest request) {
+    public ResponseEntity<ApiResponse<?>> generateAccessToken(@RequestHeader("Authorization") String token, @RequestBody GenerateAccessTokenRequest request) {
         try {
-            if (request == null || request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            if (request == null || request.getVisitorName() == null || request.getVisitorPhoneNumber() == null || request.getWhomToSee() == null) {
                 return ResponseEntity.badRequest()
-                        .body(new ApiResponse<>("Email is required", false));
+                        .body(new ApiResponse<>("Required fields are missing", false));
             }
-            // Trim email to remove any accidental whitespace
-            request.setEmail(request.getEmail().trim());
-            GenerateAccessTokenResponse response = residentServices.generateAccessToken(request);
+            GenerateAccessTokenResponse response = residentServices.generateAccessToken(request, token);
             return ResponseEntity.ok(new ApiResponse<>(response, "Access token generated successfully"));
         } catch (GatePassException e) {
             return ResponseEntity.badRequest()
@@ -83,22 +80,100 @@ public class ResidentControllers {
     }
 
     @PostMapping("/resident/find/code")
-    public ResponseEntity<ApiResponse<?>> findAccessToken( @RequestBody FindAccessTokenRequest request) {
+    public ResponseEntity<ApiResponse<?>> findAccessTokens(@RequestHeader("Authorization") String token, @RequestBody FindAccessTokensRequest request) {
         try {
-            if (request == null || request.getToken() == null || request.getToken().trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(new ApiResponse<>("Token is required", false));
-            }
-            // Trim token to remove any accidental whitespace
-            request.setToken(request.getToken().trim());
-            FindAccessTokenResponse response = residentServices.findAccessToken(request);
-            return ResponseEntity.ok(new ApiResponse<>(response, "Token found"));
+            List<FindAccessTokenResponse> response = residentServices.findAccessTokens(request, token);
+            return ResponseEntity.ok(new ApiResponse<>(new TokensResponse(response), "Tokens retrieved successfully"));
         } catch (GatePassException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(e.getMessage(), false));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("An error occurred while finding access token", false));
+                    .body(new ApiResponse<>("An error occurred while retrieving tokens", false));
+        }
+    }
+
+    @PostMapping("/resident/revoke/code")
+    public ResponseEntity<ApiResponse<?>> revokeAccessToken(@RequestHeader("Authorization") String token, @RequestBody RevokeAccessTokenRequest request) {
+        try {
+            residentServices.revokeAccessToken(request, token);
+            return ResponseEntity.ok(new ApiResponse<>(null, "Token revoked successfully"));
+        } catch (GatePassException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("An error occurred while revoking token", false));
+        }
+    }
+
+    @PostMapping("/resident/profile")
+    public ResponseEntity<ApiResponse<?>> updateProfile(@RequestHeader("Authorization") String token, @RequestBody UpdateResidentProfileRequest request) {
+        try {
+            UpdateResidentProfileResponse response = residentServices.updateProfile(request, token);
+            return ResponseEntity.ok(new ApiResponse<>(new UserResponse(response), "Profile updated successfully"));
+        } catch (GatePassException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("An error occurred while updating profile", false));
+        }
+    }
+
+    @PostMapping("/resident/change-password")
+    public ResponseEntity<ApiResponse<?>> changePassword(@RequestHeader("Authorization") String token, @RequestBody ChangePasswordRequest request) {
+        try {
+            residentServices.changePassword(request, token);
+            return ResponseEntity.ok(new ApiResponse<>(null, "Password changed successfully"));
+        } catch (GatePassException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("An error occurred while changing password", false));
+        }
+    }
+
+    @PostMapping("/resident/upload-profile-picture")
+    public ResponseEntity<?> uploadProfilePicture(@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile file) {
+        try {
+            String fileUrl = residentServices.uploadProfilePicture(file, token);
+            return ResponseEntity.ok(new ApiResponse<>(fileUrl, "Profile picture uploaded successfully"));
+        } catch (GatePassException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("An error occurred while uploading profile picture", false));
+        }
+    }
+
+    @PostMapping("/resident/visitor/history")
+    public ResponseEntity<ApiResponse<?>> getVisitorHistory(@RequestHeader("Authorization") String token, @RequestBody VisitorHistoryRequest request) {
+        try {
+            List<VisitorHistoryResponse> response = residentServices.getVisitorHistory(request, token);
+            return ResponseEntity.ok(new ApiResponse<>(new VisitorsResponse(response), "Visitor history retrieved successfully"));
+        } catch (GatePassException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("An error occurred while retrieving visitor history", false));
+        }
+    }
+
+    @GetMapping("/resident/dashboard-stats")
+    public ResponseEntity<ApiResponse<?>> getDashboardStats(@RequestHeader("Authorization") String token) {
+        try {
+            DashboardStatsResponse response = residentServices.getDashboardStats(token);
+            return ResponseEntity.ok(new ApiResponse<>(response, "Dashboard stats retrieved successfully"));
+        } catch (GatePassException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(e.getMessage(), false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("An error occurred while retrieving dashboard stats", false));
         }
     }
 }
