@@ -7,5 +7,8 @@ public class LoginResidentRequest {
     private String email;
     private String password;
 
-    public LoginResidentRequest(String email, String password) {}
+    public LoginResidentRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }
