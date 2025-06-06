@@ -1,18 +1,29 @@
 package org.example.services;
 
-import org.example.dtos.request.FindAccessToken;
-import org.example.dtos.request.GenerateAccessTokenRequest;
-import org.example.dtos.request.LoginResidentRequest;
-import org.example.dtos.request.RegisterResidentRequest;
-import org.example.dtos.response.FindAccessTokenResponse;
-import org.example.dtos.response.GenerateAccessTokenResponse;
-import org.example.dtos.response.LoginResidentResponse;
-import org.example.dtos.response.RegisterResidentResponse;
+import org.example.dtos.request.*;
+import org.example.dtos.response.*;
 
+/**
+ * Service interface for resident-related operations
+ */
 public interface ResidentServices {
+    /**
+     * Register a new resident
+     */
     RegisterResidentResponse register(RegisterResidentRequest request);
+    
+    /**
+     * Authenticate a resident
+     */
     LoginResidentResponse login(LoginResidentRequest request);
+    
+    /**
+     * Generate an access token for a visitor
+     */
     GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request);
 
-    FindAccessTokenResponse findAccessToken(FindAccessToken residentRequest);
+    /**
+     * Find and validate an access token
+     */
+    FindAccessTokenResponse findAccessToken(FindAccessTokenRequest request);
 }
