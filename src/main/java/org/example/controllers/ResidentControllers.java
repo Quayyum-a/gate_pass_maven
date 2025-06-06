@@ -43,8 +43,8 @@ public class ResidentControllers {
 
     @PostMapping("/resident/login")
     public ResponseEntity<ApiResponse<?>> loginResident(
-            @RequestParam String email,
-            @RequestParam String password) {
+            @RequestParam("email") String email,
+            @RequestParam("password") String password) {
         try {
             if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
