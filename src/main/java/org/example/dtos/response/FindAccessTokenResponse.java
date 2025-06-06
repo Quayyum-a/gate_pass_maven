@@ -16,13 +16,6 @@ public class FindAccessTokenResponse {
     private boolean isValid;
     private LocalDateTime expiryDate;
 
-    public AccessToken getAccessToken() {
-        AccessToken accessToken = new AccessToken();
-        accessToken.setVisitorName(visitorName);
-        accessToken.setVisitorPhoneNumber(visitorPhoneNumber);
-        accessToken.setWhomToSee(whomToSee);
-        return accessToken;
-    }
 
     public void setIsValid(boolean b) {
         isValid = b;
