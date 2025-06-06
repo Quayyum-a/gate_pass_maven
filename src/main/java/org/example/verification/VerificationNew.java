@@ -1,16 +1,14 @@
 package org.example.verification;
 
-import jakarta.annotation.PostConstruct;
 import org.example.data.models.AccessToken;
-import org.example.data.models.Security;
 import org.example.data.repositories.AccessTokens;
 import org.example.data.repositories.Securities;
 import org.example.exceptions.AccessTokenNotFound;
-import org.example.exceptions.GatePassException;
 import org.example.exceptions.SecurityAlreadyExsistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 
 @Component
@@ -19,7 +17,7 @@ public class VerificationNew {
 
     @Autowired
     private Securities securities;
-    
+
     @Autowired
     private AccessTokens accessTokenRepository;
 
@@ -41,10 +39,6 @@ public class VerificationNew {
         if (email == null || password == null) {
             throw new IllegalArgumentException("Email and password are required");
         }
-        Security security = instance.securities.findByEmail(email);
-        if (security == null || !security.getPassword().equals(password)) {
-            throw new GatePassException("Invalid email or password");
-        }
     }
 
     public static AccessToken verifyToken(String tokenValue) {
@@ -59,6 +53,8 @@ public class VerificationNew {
             throw new IllegalStateException("Token has already been used");
         }
         if (accessToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            accessToken.setStatus("expired");
+            instance.accessTokenRepository.save(accessToken);
             throw new IllegalStateException("Token has expired");
         }
         return accessToken;
