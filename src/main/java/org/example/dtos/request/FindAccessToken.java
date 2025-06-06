@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class FindAccessToken {
     private String email;
-    private String accessCode;
+    private String token;
 }
 
