@@ -78,16 +78,20 @@ public class ResidentServicesImpl implements ResidentServices {
 
     @Override
     public FindAccessTokenResponse findAccessToken(FindAccessToken request) {
-            FindAccessTokenResponse response = new FindAccessTokenResponse();
-            AccessToken accessToken = accessTokenRepository.findByToken(request.getAccessCode());
-            verifyToken(accessToken);
-            response.setVisitorName(accessToken.getVisitorName());
-            response.setVisitorPhoneNumber(accessToken.getVisitorPhoneNumber());
-            response.setWhomToSee(accessToken.getWhomToSee());
-            response.setResidentFullName(accessToken.getResident().getFullName());
-            response.setResidentAddress(accessToken.getResident().getAddress());
-            response.setResidentEmail(accessToken.getResident().getEmail());
-            response.setIsValid(true);
-            return response;
+        return getFindAccessTokenResponse(request, accessTokenRepository);
+    }
+
+    static FindAccessTokenResponse getFindAccessTokenResponse(FindAccessToken request, AccessTokens accessTokenRepository) {
+        FindAccessTokenResponse response = new FindAccessTokenResponse();
+        AccessToken accessToken = accessTokenRepository.findByToken(request.getAccessCode());
+        verifyToken(accessToken);
+        response.setVisitorName(accessToken.getVisitorName());
+        response.setVisitorPhoneNumber(accessToken.getVisitorPhoneNumber());
+        response.setWhomToSee(accessToken.getWhomToSee());
+        response.setResidentFullName(accessToken.getResident().getFullName());
+        response.setResidentAddress(accessToken.getResident().getAddress());
+        response.setResidentEmail(accessToken.getResident().getEmail());
+        response.setIsValid(true);
+        return response;
     }
 }
