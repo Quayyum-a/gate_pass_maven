@@ -1,29 +1,22 @@
 package org.example.services;
 
+
+
 import org.example.dtos.request.*;
 import org.example.dtos.response.*;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Service interface for resident-related operations
- */
+import java.util.List;
+
 public interface ResidentServices {
-    /**
-     * Register a new resident
-     */
     RegisterResidentResponse register(RegisterResidentRequest request);
-    
-    /**
-     * Authenticate a resident
-     */
     LoginResidentResponse login(LoginResidentRequest request);
-    
-    /**
-     * Generate an access token for a visitor
-     */
-    GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request);
-
-    /**
-     * Find and validate an access token
-     */
-    FindAccessTokenResponse findAccessToken(FindAccessTokenRequest request);
+    GenerateAccessTokenResponse generateAccessToken(GenerateAccessTokenRequest request, String token);
+    List<FindAccessTokenResponse> findAccessTokens(FindAccessTokensRequest request, String token);
+    void revokeAccessToken(RevokeAccessTokenRequest request, String token);
+    UpdateResidentProfileResponse updateProfile(UpdateResidentProfileRequest request, String token);
+    void changePassword(ChangePasswordRequest request, String token);
+    String uploadProfilePicture(MultipartFile file, String token);
+    List<VisitorHistoryResponse> getVisitorHistory(VisitorHistoryRequest request, String token);
+    DashboardStatsResponse getDashboardStats(String token);
 }
