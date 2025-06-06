@@ -42,8 +42,8 @@ public class SecurityControllers {
 
     @PostMapping("/security/login")
     public ResponseEntity<ApiResponse<?>> loginSecurity(
-            @RequestParam String email,
-            @RequestParam String password) {
+            @RequestParam("email") String email,
+            @RequestParam("password") String password) {
         try {
             if (email == null || email.isBlank() || password == null || password.isBlank()) {
                 return ResponseEntity.badRequest()
