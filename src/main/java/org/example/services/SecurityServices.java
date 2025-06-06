@@ -1,28 +1,19 @@
 package org.example.services;
 
-import org.example.dtos.request.FindAccessTokenRequest;
-import org.example.dtos.request.LoginSecurityRequest;
-import org.example.dtos.request.RegisterSecurityRequest;
-import org.example.dtos.response.FindAccessTokenResponse;
-import org.example.dtos.response.LoginSecurityResponse;
-import org.example.dtos.response.RegisterSecurityResponse;
 
-/**
- * Service interface for security personnel operations
- */
+import org.example.dtos.request.*;
+import org.example.dtos.response.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
 public interface SecurityServices {
-    /**
-     * Register a new security personnel
-     */
     RegisterSecurityResponse register(RegisterSecurityRequest request);
-
-    /**
-     * Authenticate a security personnel
-     */
     LoginSecurityResponse login(LoginSecurityRequest request);
-
-    /**
-     * Find and validate an access token
-     */
-    FindAccessTokenResponse findAccessToken(FindAccessTokenRequest request);
+    FindAccessTokenResponse findAccessToken(FindAccessTokensRequest request, String token);
+    List<VisitorLogResponse> getVisitorLogs(VisitorLogsRequest request, String token);
+    UpdateSecurityProfileResponse updateProfile(UpdateSecurityProfileRequest request, String token);
+    void changePassword(ChangePasswordRequest request, String token);
+    String uploadProfilePicture(MultipartFile file, String token);
+    DashboardStatsResponse getDashboardStats(String token);
 }
