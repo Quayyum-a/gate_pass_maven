@@ -16,6 +16,7 @@ public class AccessToken {
     private LocalDateTime creationDate;
     private LocalDateTime expiryDate;
     private boolean isUsed;
+    private String status; // Added to support active/expired/revoked states
     @DBRef
     private Resident resident;
     @DBRef
@@ -23,6 +24,4 @@ public class AccessToken {
     private String visitorPhoneNumber;
     private String whomToSee;
     private String visitorName;
-
-
 }
